@@ -2,15 +2,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:Schets.Graphics"
+        xmlns:graphics="using:Schets.Graphics"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Schets.UI.MainWindow"
         Title="Schets"
         WindowStartupLocation="CenterScreen"
         ExtendClientAreaToDecorationsHint="True">
-
   <Panel>
-    <DockPanel LastChildFill="False">
+    <DockPanel LastChildFill="False" ClipToBounds="True">
       <Menu DockPanel.Dock="Top" Background="lightgray">
         <MenuItem Header="_File">
           <MenuItem Header="_New" Click="FileNewClicked" HotKey="Ctrl+N"></MenuItem>
@@ -18,7 +17,7 @@
           <Separator />
           <MenuItem Header="_Save" Click="FileSaveClicked" HotKey="Ctrl+S"></MenuItem>
           <MenuItem Header="_Save As" Click="FileSaveAsClicked" HotKey="Ctrl+Shift+S"></MenuItem>
-        
+          
           <MenuItem Header="_Exit" Click="ExitApplicationClicked"></MenuItem>
         </MenuItem>
       </Menu>
@@ -31,7 +30,7 @@
         BorderThickness="2" 
         BorderBrush="Black">
         
-        <vm:DrawSurface Name="DrawSurface" Width="100" Height="100"></vm:DrawSurface>
+        <graphics:DrawSurface Name="DrawSurface" Width="100" Height="100"></graphics:DrawSurface>
       </Border>
     </StackPanel>
   </Panel>

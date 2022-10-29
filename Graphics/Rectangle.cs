@@ -17,11 +17,11 @@ public class Rectangle : IShape {
     public IBrush? Fill { get; set; }
     
     public void Render(DrawingContext context) {
-        Rect r = new Rect(this.TopLeft.Transform(context.CurrentTransform), this.BottomRight.Transform(context.CurrentTransform));
+        Rect r = new Rect(this.TopLeft, this.BottomRight);
         if (this.Fill == null) {
-            context.FillRectangle(this.Fill, r);
-        } else {
             context.DrawRectangle(this.Outline, r);
+        } else {
+            context.FillRectangle(this.Fill, r);
         }
     }
 }

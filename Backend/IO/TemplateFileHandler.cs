@@ -1,6 +1,6 @@
 namespace Schets.Backend.IO;
 
-public class TemplateFileHandler {
+public static class TemplateFileHandler {
 
     public static IoResult<Template> OpenTemplate(string path) {
         IoResult<byte[]> openResult = FileHandler.OpenFile(path);

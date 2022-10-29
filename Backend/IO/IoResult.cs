@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace Schets.Backend.IO; 
 
 public class IoResult<T> {
@@ -24,11 +22,11 @@ public class IoResult<T> {
         };
     }
 
-    public IoResult<A> Any<A>() {
-        return new IoResult<A>() {
+    public IoResult<TA> Any<TA>() {
+        return new IoResult<TA>() {
             Error = this.Error,
             IsOk = this.IsOk,
-            Value = default(A)
+            Value = default
         };
     }
 }

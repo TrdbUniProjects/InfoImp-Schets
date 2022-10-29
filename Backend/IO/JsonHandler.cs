@@ -6,7 +6,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Schets.Backend.IO; 
 
-public class JsonHandler {
+public static class JsonHandler {
 
     public static IoResult<T> Deserialize<T>(byte[] bytes) {
         string stringContents;

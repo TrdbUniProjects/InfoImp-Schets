@@ -12,15 +12,15 @@ namespace Schets.UI;
 public partial class MainWindow : Window {
     public MainWindow() {
         this.InitializeComponent();
+        this.Opened += (_, _) => new ToolbarWindow().ShowDialog(this);
     }
-
+    // ReSharper disable UnusedParameter.Local
     private async void FileNewClicked(object? sender, RoutedEventArgs e) {
         await new CreateNewWindow().ShowDialog(this);
-        this.Title = "untitled - Schets";
     }
     
     private async void FileOpenClicked(object? sender, RoutedEventArgs args) {
-        OpenFileDialog? dialog = new OpenFileDialog() {
+        OpenFileDialog dialog = new() {
             AllowMultiple = false,
             Title = "Select template",
             Filters = new List<FileDialogFilter> {
@@ -33,6 +33,7 @@ public partial class MainWindow : Window {
             },
             Directory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
         };
+        
         string[]? selectedFiles = await dialog.ShowAsync(this);
         if (selectedFiles == null) {
             return;

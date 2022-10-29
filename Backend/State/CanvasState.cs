@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace Schets.Backend.State; 
 
-public class CanvasState {
+public static class CanvasState {
 
     public static List<TemplateShapeDescriptor> Layers { get; private set; }= new List<TemplateShapeDescriptor>();
 
@@ -18,7 +18,6 @@ public class CanvasState {
     public static void RemoveLayer(int idx) {
         if (idx > Layers.Count) {
             throw new WarningException($"Index {idx} out of bounds for _layers. Length = {Layers.Count}");
-            return;
         }
         
         Layers.RemoveAt(idx);

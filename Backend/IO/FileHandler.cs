@@ -2,7 +2,7 @@ using System.IO;
 
 namespace Schets.Backend.IO; 
 
-public class FileHandler {
+public static class FileHandler {
 
     public static IoResult<byte[]> OpenFile(string path) {
         if (!File.Exists(path)) {
