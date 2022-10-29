@@ -1,0 +1,27 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        Width="300"
+        Height="400"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        WindowStartupLocation="CenterOwner"
+        x:Class="Schets.UI.CreateNewWindow"
+        Title="New">
+  <StackPanel HorizontalAlignment="Center" Margin="0,30,0,30">
+    <Grid ColumnDefinitions="Auto,Auto,Auto" RowDefinitions="Auto,Auto">
+      <Label Grid.Row="0" Grid.Column="0" Margin="0,0,5,5">Width</Label>
+      <TextBox Grid.Row="0" Grid.Column="1" Name="WidthField" Margin="0,0,0,5">800</TextBox>
+      <Label Grid.Row="0" Grid.Column="2" Margin="5, 0, 0, 5">pixels</Label>
+      
+      <Label Grid.Row="1" Grid.Column="0" Margin="0,0,5,0">Height</Label>
+      <TextBox Grid.Row="1" Grid.Column="1" Name="HeightField">600</TextBox>
+      <Label Grid.Row="1" Grid.Column="2" Margin="5, 0, 0, 5">pixels</Label>
+    </Grid>
+    
+    <WrapPanel HorizontalAlignment="Center" Margin="0,20,0,0">
+      <Button Click="OkButtonClicked" Margin="0,0,10,0">Ok</Button>
+      <Button Click="CancelButtonClicked">Cancel</Button>
+    </WrapPanel>
+  </StackPanel>
+</Window>
