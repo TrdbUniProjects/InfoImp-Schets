@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Schets.Backend;
 using Schets.Backend.State;
 using Schets.Graphics;
 using Schets.Util;
@@ -35,6 +36,8 @@ public partial class CreateNewWindow : Window {
             this.ShowInvalidValueDialog(heightField.Text);
             return;
         }
+
+        CanvasState.SetLayers(Array.Empty<TemplateShapeDescriptor>());
         
         DrawSurface drawSurface = this.Owner.FindControl<DrawSurface>("DrawSurface")!;
 

@@ -7,6 +7,8 @@ public static class CanvasState {
 
     public static List<TemplateShapeDescriptor> Layers { get; private set; }= new List<TemplateShapeDescriptor>();
 
+    public static SelectedTool SelectedTool = SelectedTool.Rectangle;
+    
     public static void SetLayers(IEnumerable<TemplateShapeDescriptor> shapes) {
         Layers = new List<TemplateShapeDescriptor>(shapes);
     }

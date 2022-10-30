@@ -12,13 +12,16 @@
     <DockPanel LastChildFill="False" ClipToBounds="True">
       <Menu DockPanel.Dock="Top" Background="lightgray">
         <MenuItem Header="_File">
-          <MenuItem Header="_New" Click="FileNewClicked" HotKey="Ctrl+N"></MenuItem>
-          <MenuItem Header="_Open" Click="FileOpenClicked" HotKey="Ctrl+O"></MenuItem>
+          <MenuItem Header="_New" Click="File_NewClicked" HotKey="Ctrl+N"></MenuItem>
+          <MenuItem Header="_Open" Click="File_OpenClicked" HotKey="Ctrl+O"></MenuItem>
           <Separator />
-          <MenuItem Header="_Save" Click="FileSaveClicked" HotKey="Ctrl+S"></MenuItem>
-          <MenuItem Header="_Save As" Click="FileSaveAsClicked" HotKey="Ctrl+Shift+S"></MenuItem>
+          <MenuItem Header="_Save" Click="File_SaveClicked" HotKey="Ctrl+S"></MenuItem>
+          <MenuItem Header="_Save As" Click="File_SaveAsClicked" HotKey="Ctrl+Shift+S"></MenuItem>
           
-          <MenuItem Header="_Exit" Click="ExitApplicationClicked"></MenuItem>
+          <MenuItem Header="_Exit" Click="File_ExitClicked"></MenuItem>
+        </MenuItem>
+        <MenuItem Header="_Window">
+          <MenuItem Header="_Tools" Click="Window_ToolClicked"></MenuItem>
         </MenuItem>
       </Menu>
     </DockPanel>

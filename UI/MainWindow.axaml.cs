@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Schets.Backend;
@@ -10,16 +11,42 @@ using Schets.Graphics;
 namespace Schets.UI; 
 
 public partial class MainWindow : Window {
+
+    private bool _isToolWindowOpened = false;
+    
     public MainWindow() {
         this.InitializeComponent();
-        this.Opened += (_, _) => new ToolbarWindow().ShowDialog(this);
+        this.Opened += (_, _) => this.OpenToolWindow();
     }
+
+    private void OpenToolWindow() {
+        if (this._isToolWindowOpened) {
+            return;
+        }
+
+        ToolbarWindow window = new() {
+            Position = new PixelPoint(
+                this.Position.X + 30,
+                this.Position.Y + (int)this.Height / 2
+            ),
+            ShowInTaskbar = false,
+        };
+        window.Closed += (_, _) => this._isToolWindowOpened = false;    
+        
+        window.Show(this);
+        this._isToolWindowOpened = true;
+    }
+
     // ReSharper disable UnusedParameter.Local
-    private async void FileNewClicked(object? sender, RoutedEventArgs e) {
+    private void Window_ToolClicked(object? sender, RoutedEventArgs args) => this.OpenToolWindow();
+
+
+    // ReSharper disable UnusedParameter.Local
+    private async void File_NewClicked(object? sender, RoutedEventArgs args) {
         await new CreateNewWindow().ShowDialog(this);
     }
     
-    private async void FileOpenClicked(object? sender, RoutedEventArgs args) {
+    private async void File_OpenClicked(object? sender, RoutedEventArgs args) {
         OpenFileDialog dialog = new() {
             AllowMultiple = false,
             Title = "Select template",
@@ -57,15 +84,15 @@ public partial class MainWindow : Window {
         surface.InvalidateVisual();
     }
 
-    private void ExitApplicationClicked(object? sender, RoutedEventArgs e) {
+    private void File_ExitClicked(object? sender, RoutedEventArgs e) {
         this.Close();
     }
 
-    private void FileSaveClicked(object? sender, RoutedEventArgs e) {
+    private void File_SaveClicked(object? sender, RoutedEventArgs e) {
         throw new System.NotImplementedException();
     }
 
-    private void FileSaveAsClicked(object? sender, RoutedEventArgs e) {
+    private void File_SaveAsClicked(object? sender, RoutedEventArgs e) {
         throw new System.NotImplementedException();
     }
 }

@@ -23,11 +23,15 @@ public struct TemplateShapeOutline {
 public struct TemplateCoordinate {
     public double X { get; set; }
     public double Y { get; set; }
+
+    public override string ToString() {
+        return $"(X: {this.X}, Y: {this.Y})";
+    }
 }
 
 public enum TemplateShapeType {
     Rectangle,
-    Elipse,
+    Ellipse,
 }
 
 public struct TemplateSize {
