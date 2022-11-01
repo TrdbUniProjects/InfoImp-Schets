@@ -5,13 +5,13 @@ namespace Schets.Graphics;
 
 public class Ellipse : AbstractShape {
     public override void Render(DrawingContext context) {
-        double height = this.BottomRight.Y - this.TopLeft.Y;
-        double width = this.BottomRight.X - this.TopLeft.X;
+        double height = this.B.Y - this.A.Y;
+        double width = this.B.X - this.A.X;
         
         context.DrawEllipse(
             this.Fill,
             this.Outline,
-            new Point(this.TopLeft.X + width / 2d, this.TopLeft.Y + height / 2d),
+            new Point(this.A.X + width / 2d, this.A.Y + height / 2d),
             width / 2d,
             height / 2d
         );

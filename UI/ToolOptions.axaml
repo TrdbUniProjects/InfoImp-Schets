@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Schets.UI.ToolOptions">
+  <DockPanel LastChildFill="False" ClipToBounds="True">
+    <Menu DockPanel.Dock="Top" Background="#e3e2e1" Height="36">
+      <Label>Fill mode:</Label>
+      <ComboBox SelectedIndex="0" Margin="0,3,0,3" Name="FillModeControl" Height="30" SelectionChanged="FillModeControl_OnSelectionChanged">
+        <ComboBoxItem Width="30" Height="30" ToolTip.Tip="Filled">
+          <Image 
+            Width="20" 
+            Height="20" 
+            Source="/Assets/FillMode/filled.png"
+            Margin="5,5,5,5"></Image>
+        </ComboBoxItem>
+        <ComboBoxItem Width="30" Height="30" ToolTip.Tip="Outline">
+          <Image 
+            Width="20" 
+            Height="20" 
+            Source="/Assets/FillMode/outline.png"
+            Margin="5,5,5,5"></Image>
+        </ComboBoxItem>
+        <ComboBoxItem Width="30" Height="30" ToolTip.Tip="Filled with outline">
+          <Image 
+            Width="20" 
+            Height="20" 
+            Source="/Assets/FillMode/filled-outline.png"
+            Margin="5,5,5,5"></Image>
+        </ComboBoxItem>
+      </ComboBox>
+      
+      <Label>Brush width:</Label>
+      <TextBox Margin="0,3,0,3" Text="2"></TextBox>
+    </Menu>
+  </DockPanel>
+</UserControl>

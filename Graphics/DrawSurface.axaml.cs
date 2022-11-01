@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
-using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Schets.Backend;
 using Schets.Backend.State;
 namespace Schets.Graphics; 
@@ -53,16 +51,57 @@ public partial class DrawSurface : UserControl {
 
         Point drawEndPoint = args.GetPosition(this);
 
-        (TemplateCoordinate topLeft, TemplateCoordinate bottomRight) =
-            CalculateShapeCoordinates(this._drawStartPoint.GetValueOrDefault(), drawEndPoint);
+        TemplateShapeDescriptor descriptor;
+        if (GetActiveShapeType() == TemplateShapeType.Line) {
+            descriptor = new TemplateShapeDescriptor {
+                ShapeType = GetActiveShapeType(),
+                A = new TemplateCoordinate {
+                    X = this._drawStartPoint.GetValueOrDefault().X,
+                    Y = this._drawStartPoint.GetValueOrDefault().Y
+                },
+                B = new TemplateCoordinate {
+                    X = drawEndPoint.X,
+                    Y = drawEndPoint.Y
+                },
+                Outline = new TemplateShapeOutline {
+                    Color = CanvasState.PrimaryColor,
+                    Thickness = CanvasState.BrushWidth,
+                }
+            };
+        } else {
+            (TemplateCoordinate topLeft, TemplateCoordinate bottomRight) =
+                CalculateShapeCoordinates(this._drawStartPoint.GetValueOrDefault(), drawEndPoint);
         
-        TemplateShapeDescriptor descriptor = new() {
-            ShapeType = GetActiveShapeType(),
-            TopLeft = topLeft,
-            BottomRight = bottomRight,
-            BackgroundColor = 4294901760
-        };
-        
+            descriptor = new TemplateShapeDescriptor {
+                ShapeType = GetActiveShapeType(),
+                A = topLeft,
+                B = bottomRight
+            };
+
+            switch (CanvasState.FillMode) {
+                case FillMode.Filled:
+                    descriptor.BackgroundColor = CanvasState.PrimaryColor;
+                    descriptor.Outline = null;
+                    break;
+                case FillMode.Outline:
+                    descriptor.BackgroundColor = null;
+                    descriptor.Outline = new TemplateShapeOutline {
+                        Color = CanvasState.PrimaryColor,
+                        Thickness = CanvasState.BrushWidth
+                    };
+                    break;
+                case FillMode.FilledOutline:
+                    descriptor.BackgroundColor = CanvasState.PrimaryColor;
+                    descriptor.Outline = new TemplateShapeOutline {
+                        Color = CanvasState.SecondaryColor,
+                        Thickness = CanvasState.BrushWidth
+                    };
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         CanvasState.AddLayer(descriptor);
         this.InvalidateVisual();
     }
@@ -137,6 +176,7 @@ public partial class DrawSurface : UserControl {
         return CanvasState.SelectedTool switch {
             SelectedTool.Rectangle => TemplateShapeType.Rectangle,
             SelectedTool.Ellipse => TemplateShapeType.Ellipse,
+            SelectedTool.Line => TemplateShapeType.Line,
         };
     }
 
@@ -148,6 +188,7 @@ public partial class DrawSurface : UserControl {
         AbstractShape shape =  layer.ShapeType switch {
             TemplateShapeType.Rectangle => new Rectangle(),
             TemplateShapeType.Ellipse => new Ellipse(),
+            TemplateShapeType.Line => new Line(),
             _ => throw new NotImplementedException("Shape not yet implemented")
         };
         
@@ -156,8 +197,8 @@ public partial class DrawSurface : UserControl {
     }
 
     private static void SetShapeProperties<T>(ref T shape, TemplateShapeDescriptor layer) where T: AbstractShape {
-        shape.TopLeft = new Point(layer.TopLeft.X, layer.TopLeft.Y);
-        shape.BottomRight = new Point(layer.BottomRight.X, layer.BottomRight.Y);
+        shape.A = new Point(layer.A.X, layer.A.Y);
+        shape.B = new Point(layer.B.X, layer.B.Y);
 
         if (layer.Outline != null) {
             shape.Outline = new Pen {

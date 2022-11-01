@@ -8,8 +8,8 @@ public struct Template {
 public struct TemplateShapeDescriptor {
     public TemplateShapeType ShapeType { get; set; }
     
-    public TemplateCoordinate TopLeft { get; set; }
-    public TemplateCoordinate BottomRight { get; set; }
+    public TemplateCoordinate A { get; set; }
+    public TemplateCoordinate B { get; set; }
     
     public TemplateShapeOutline? Outline { get; set; }
     public uint? BackgroundColor { get; set; }
@@ -32,6 +32,7 @@ public struct TemplateCoordinate {
 public enum TemplateShapeType {
     Rectangle,
     Ellipse,
+    Line
 }
 
 public struct TemplateSize {

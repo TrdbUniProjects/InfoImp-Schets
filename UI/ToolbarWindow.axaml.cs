@@ -13,6 +13,7 @@ namespace Schets.UI;
 public partial class ToolbarWindow : Window {
 
     private Button? _selectedTool;
+    private IBrush? _defaultBackground;
     
     public ToolbarWindow() {
         InitializeComponent();
@@ -25,14 +26,17 @@ public partial class ToolbarWindow : Window {
         AvaloniaXamlLoader.Load(this);
 
         Button? defaultTool = this.GetControl<Button>("DefaultTool");
-        if (defaultTool != null) {
-            this._selectedTool = defaultTool;
-            
-            ImmutableSolidColorBrush brush = (ImmutableSolidColorBrush)defaultTool!.Background!;
-            defaultTool.Background = new SolidColorBrush {
-                Color = DarkenColor(brush.Color)
-            };
+        if (defaultTool == null) {
+            return;
         }
+        
+        this._selectedTool = defaultTool;
+        ImmutableSolidColorBrush brush = (ImmutableSolidColorBrush)defaultTool!.Background!;
+
+        this._defaultBackground = defaultTool.Background;
+        defaultTool.Background = new SolidColorBrush {
+            Color = DarkenColor(brush.Color)
+        };
     }
 
     private void Tool_RectangleClicked(object? sender, RoutedEventArgs e) {
@@ -49,17 +53,23 @@ public partial class ToolbarWindow : Window {
         Button newToolBtn = (Button)newTool;
         if (this._selectedTool != null) {
             // 'reset' the background color of the old tool
-            this._selectedTool.Background = newToolBtn.Background;
+            this._selectedTool.Background = this._defaultBackground ?? newToolBtn.Background;
             this._selectedTool.InvalidateVisual();
         }
 
         // Get the current background color
-        ImmutableSolidColorBrush background = (ImmutableSolidColorBrush)newToolBtn.Background!;
-        
-        newToolBtn.Background = new SolidColorBrush {
-            Color = DarkenColor(background.Color)
-        };
-        
+        if (newToolBtn.Background! is ImmutableSolidColorBrush) {
+            ImmutableSolidColorBrush background = (ImmutableSolidColorBrush)newToolBtn.Background!;
+            newToolBtn.Background = new SolidColorBrush {
+                Color = DarkenColor(background.Color)
+            };
+        } else {
+            SolidColorBrush background = (SolidColorBrush)newToolBtn.Background!;
+            newToolBtn.Background = new SolidColorBrush {
+                Color = DarkenColor(background.Color)
+            };
+        }
+
         newToolBtn.InvalidateVisual();
         this._selectedTool = newToolBtn;
     }
@@ -81,5 +91,10 @@ public partial class ToolbarWindow : Window {
         Rgb newColor = ColorUtil.FromHsv(hsv);
 
         return new Color(255, (byte)newColor.R, (byte)newColor.G, (byte)newColor.B);
+    }
+
+    private void Tool_LineClicked(object? sender, RoutedEventArgs e) {
+        this.UpdateSelectedToolColor(sender!);
+        CanvasState.SelectedTool = SelectedTool.Line;
     }
 }

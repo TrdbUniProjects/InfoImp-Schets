@@ -5,13 +5,10 @@ namespace Schets.Graphics;
 
 public abstract class AbstractShape {
     
-    public Point TopLeft { get; set; }
-    public Point BottomRight { get; set; }
+    public Point A { get; set; }
+    public Point B { get; set; }
 
-    public Pen Outline { get; set; } = new() {
-        Brush = Brushes.Black,
-        Thickness = 1f
-    };
+    public Pen? Outline { get; set; }
 
     public IBrush? Fill { get; set; }
     
