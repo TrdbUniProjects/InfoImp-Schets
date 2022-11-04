@@ -1,4 +1,3 @@
-using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -31,7 +30,7 @@ public partial class ToolbarWindow : Window {
         }
         
         this._selectedTool = defaultTool;
-        ImmutableSolidColorBrush brush = (ImmutableSolidColorBrush)defaultTool!.Background!;
+        ImmutableSolidColorBrush brush = (ImmutableSolidColorBrush)defaultTool.Background!;
 
         this._defaultBackground = defaultTool.Background;
         defaultTool.Background = new SolidColorBrush {
@@ -39,11 +38,13 @@ public partial class ToolbarWindow : Window {
         };
     }
 
+    // ReSharper disable once UnusedParameter.Local
     private void Tool_RectangleClicked(object? sender, RoutedEventArgs e) {
         this.UpdateSelectedToolColor(sender!);
         CanvasState.SelectedTool = SelectedTool.Rectangle;
     }
 
+    // ReSharper disable once UnusedParameter.Local
     private void Tool_EllipseClicked(object? sender, RoutedEventArgs e) {
         this.UpdateSelectedToolColor(sender!);
         CanvasState.SelectedTool = SelectedTool.Ellipse;
@@ -93,8 +94,15 @@ public partial class ToolbarWindow : Window {
         return new Color(255, (byte)newColor.R, (byte)newColor.G, (byte)newColor.B);
     }
 
+    // ReSharper disable once UnusedParameter.Local
     private void Tool_LineClicked(object? sender, RoutedEventArgs e) {
         this.UpdateSelectedToolColor(sender!);
         CanvasState.SelectedTool = SelectedTool.Line;
+    }
+
+    // ReSharper disable once UnusedParameter.Local
+    private void Tool_EraserClicked(object? sender, RoutedEventArgs e) {
+        this.UpdateSelectedToolColor(sender!);
+        CanvasState.SelectedTool = SelectedTool.Eraser;
     }
 }

@@ -1,3 +1,5 @@
+using Avalonia;
+
 namespace Schets.Backend; 
 
 public struct Template {
@@ -26,6 +28,10 @@ public struct TemplateCoordinate {
 
     public override string ToString() {
         return $"(X: {this.X}, Y: {this.Y})";
+    }
+
+    public Point ToPoint() {
+        return new Point(this.X, this.Y);
     }
 }
 

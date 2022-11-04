@@ -32,7 +32,7 @@
       </ComboBox>
       
       <Label>Brush width:</Label>
-      <TextBox Margin="0,3,0,3" Text="2"></TextBox>
+      <TextBox Margin="0,3,0,3" Text="2" Name="BrushWidthField" PropertyChanged="BrushWidthField_OnPropertyChanged"></TextBox>
     </Menu>
   </DockPanel>
 </UserControl>

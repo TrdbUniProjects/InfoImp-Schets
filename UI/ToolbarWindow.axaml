@@ -46,6 +46,17 @@
       Click="Tool_LineClicked">
       <Image Source="/Assets/Tools/line.png"></Image>
     </Button>
-    <Button Grid.Row="1" Grid.Column="1" Width="40" Height="40" Margin="0,0,5,0">Foo</Button>
+    
+    <Button 
+      Grid.Row="1" 
+      Grid.Column="1" 
+      Width="40" 
+      Height="40" 
+      Margin="0,0,5,0"
+      ToolTip.Tip="Eraser tool"
+      Background="Lightgray"
+      Click="Tool_EraserClicked">
+      <Image Source="/Assets/Tools/eraser.png"></Image>
+    </Button>
   </Grid>
 </Window>
