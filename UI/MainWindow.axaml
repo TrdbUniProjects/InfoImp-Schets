@@ -36,7 +36,7 @@
         BorderThickness="2" 
         BorderBrush="Black">
         
-        <graphics:DrawSurface Name="DrawSurface" Width="100" Height="100"></graphics:DrawSurface>
+        <graphics:DrawSurface Name="DrawSurface" Width="800" Height="600"></graphics:DrawSurface>
       </Border>
     </StackPanel>
   </Panel>

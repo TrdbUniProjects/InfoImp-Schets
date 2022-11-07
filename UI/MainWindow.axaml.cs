@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Media.Imaging;
 using Schets.Backend;
 using Schets.Backend.IO;
 using Schets.Backend.State;
@@ -12,7 +14,7 @@ namespace Schets.UI;
 
 public partial class MainWindow : Window {
 
-    private bool _isToolWindowOpened = false;
+    private bool _isToolWindowOpened;
     
     public MainWindow() {
         this.InitializeComponent();
@@ -88,11 +90,59 @@ public partial class MainWindow : Window {
         this.Close();
     }
 
-    private void File_SaveClicked(object? sender, RoutedEventArgs e) {
-        throw new System.NotImplementedException();
+    private async void File_SaveClicked(object? sender, RoutedEventArgs e) {
+        string path;
+
+        if (ProgramState.OpenedFilePath != null) {
+            path = ProgramState.OpenedFilePath;
+        } else {
+            SaveFileDialog saveFileDialog = new() {
+                DefaultExtension = Constants.TemplateFileExtension,
+                Directory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+            };
+            string? selectedPath = await saveFileDialog.ShowAsync(this);
+
+            if (selectedPath == null) {
+                return;
+            }
+
+            path = selectedPath;
+        }
+
+        ProgramState.OpenedFilePath = path;
+        this.Title = $"{path} - Schets";
+        
+        DrawSurface surface = this.FindControl<DrawSurface>("DrawSurface")!;
+        Template t = new() {
+            Size = new TemplateSize() {
+                Width = (int)surface.Width,
+                Height = (int)surface.Height
+            },
+            Shapes = CanvasState.Layers.ToArray()
+        };
+
+        TemplateFileHandler.SaveTemplate(path, t);
     }
 
-    private void File_SaveAsClicked(object? sender, RoutedEventArgs e) {
-        throw new System.NotImplementedException();
+    private async void File_SaveAsClicked(object? sender, RoutedEventArgs e) {
+        string? path = await new SaveFileDialog() {
+            DefaultExtension = "png",
+            Directory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+        }.ShowAsync(this);
+
+        if (path == null) {
+            return;
+        }
+        
+        DrawSurface surface = this.FindControl<DrawSurface>("DrawSurface")!;
+
+        RenderTargetBitmap bitmap = new RenderTargetBitmap(new PixelSize((int) surface.Width, (int) surface.Height));
+        bitmap.Render(surface);
+
+        try {
+            bitmap.Save(path);
+        } catch (IOException) {
+            throw new NotImplementedException("IO error");
+        }
     }
 }
