@@ -152,11 +152,20 @@ public partial class DrawSurface : UserControl {
         return descriptor.ShapeType switch {
             TemplateShapeType.Rectangle => this.HitTestSquare(descriptor, point),
             TemplateShapeType.Ellipse => this.HitTestEllipse(descriptor, point),
-            TemplateShapeType.Line =>
-                // TODO
-                false,
+            TemplateShapeType.Line => this.HitTestLine(descriptor, point),
             _ => throw new CaseNotImplementedException($"No hit-test implemented for shape type {descriptor.ShapeType}")
         };
+    }
+
+    private bool HitTestLine(TemplateShapeDescriptor descriptor, Point point) {
+        double dist = DistanceToLine(
+            descriptor.A.ToPoint(),
+            descriptor.B.ToPoint(),
+            point
+        );
+        double factor = Math.Max(this.Width * 0.05, this.Height * 0.05);
+        
+        return dist < factor;
     }
 
     private bool HitTestEllipse(TemplateShapeDescriptor descriptor, Point point) {

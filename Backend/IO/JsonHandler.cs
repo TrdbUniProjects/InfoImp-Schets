@@ -6,8 +6,23 @@ using Newtonsoft.Json.Serialization;
 
 namespace Schets.Backend.IO; 
 
+/// <summary>
+/// JSON handler
+/// </summary>
 public static class JsonHandler {
 
+    /// <summary>
+    /// Deserialize JSON from bytes
+    /// </summary>
+    /// <param name="bytes">The bytes to deserialize</param>
+    /// <typeparam name="T">The type to deserialize to</typeparam>
+    /// <returns>
+    /// The deserialized value.
+    /// Returns an error condition if:
+    /// - The bytes are not valid UTF-8
+    /// - The string is not valid JSON
+    /// - The JSON does not match the type provided
+    /// </returns>
     public static IoResult<T> Deserialize<T>(byte[] bytes) {
         string stringContents;
         try {
@@ -16,7 +31,7 @@ public static class JsonHandler {
             return IoResult<T>.Fail(e.ToString());
         }
 
-        List<string> errors = new List<string>();
+        List<string> errors = new();
         T? value = JsonConvert.DeserializeObject<T>(
             stringContents,
             new JsonSerializerSettings() {
@@ -41,6 +56,14 @@ public static class JsonHandler {
         return IoResult<T>.Ok(value);
     }
 
+    /// <summary>
+    /// Serialize to JSON
+    /// </summary>
+    /// <param name="value">The value to serialize</param>
+    /// <typeparam name="T">The type of the value to serialize</typeparam>
+    /// <returns>
+    /// The serialized value encoded in UTF-8
+    /// </returns>
     public static byte[] Serialize<T>(T value) {
         string serialized = JsonConvert.SerializeObject(value);
         return Encoding.UTF8.GetBytes(serialized);
