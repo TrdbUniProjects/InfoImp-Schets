@@ -21,6 +21,9 @@ public partial class MainWindow : Window {
         this.Opened += (_, _) => this.OpenToolWindow();
     }
 
+    /// <summary>
+    /// Opens the tool selection window, if it is not already openeed
+    /// </summary>
     private void OpenToolWindow() {
         if (this._isToolWindowOpened) {
             return;
@@ -39,21 +42,35 @@ public partial class MainWindow : Window {
         this._isToolWindowOpened = true;
     }
 
+    /// <summary>
+    /// The Window->Tools button was clicked
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="args">The event arguments</param>
     // ReSharper disable UnusedParameter.Local
     private void Window_ToolClicked(object? sender, RoutedEventArgs args) => this.OpenToolWindow();
 
-
+    /// <summary>
+    /// The File->New button was clicked
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="args">The event arguments</param>
     // ReSharper disable UnusedParameter.Local
     private async void File_NewClicked(object? sender, RoutedEventArgs args) {
         await new CreateNewWindow().ShowDialog(this);
     }
     
+    /// <summary>
+    /// The File-Open button was clicked
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="args">The event arguments</param>
     private async void File_OpenClicked(object? sender, RoutedEventArgs args) {
         OpenFileDialog dialog = new() {
             AllowMultiple = false,
             Title = "Select template",
             Filters = new List<FileDialogFilter> {
-                new FileDialogFilter {
+                new() {
                     Name = "Schets Templates",
                     Extensions = {
                         Constants.TemplateFileExtension
@@ -86,10 +103,20 @@ public partial class MainWindow : Window {
         surface.InvalidateVisual();
     }
 
+    /// <summary>
+    /// The File->Exit button was clicked
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="e">The event arguments</param>
     private void File_ExitClicked(object? sender, RoutedEventArgs e) {
         this.Close();
     }
 
+    /// <summary>
+    /// The File->Save button was clicked
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="e">The event arguments</param>
     private async void File_SaveClicked(object? sender, RoutedEventArgs e) {
         string path;
 
@@ -124,6 +151,11 @@ public partial class MainWindow : Window {
         TemplateFileHandler.SaveTemplate(path, t);
     }
 
+    /// <summary>
+    /// The File->SaveAs button was clicked
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="e">The event arguments</param>
     private async void File_SaveAsClicked(object? sender, RoutedEventArgs e) {
         string? path = await new SaveFileDialog() {
             DefaultExtension = "png",

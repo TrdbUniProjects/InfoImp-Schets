@@ -9,13 +9,22 @@ using Schets.Util;
 
 namespace Schets.UI;
 
+/// <summary>
+/// The toolbar window
+/// </summary>
 public partial class ToolbarWindow : Window {
 
+    /// <summary>
+    /// The button associated with the selected tool
+    /// </summary>
     private Button? _selectedTool;
+    /// <summary>
+    /// The default (unselected) background
+    /// </summary>
     private IBrush? _defaultBackground;
     
     public ToolbarWindow() {
-        InitializeComponent();
+        this.InitializeComponent();
 #if DEBUG
         this.AttachDevTools();
 #endif
@@ -32,24 +41,39 @@ public partial class ToolbarWindow : Window {
         this._selectedTool = defaultTool;
         ImmutableSolidColorBrush brush = (ImmutableSolidColorBrush)defaultTool.Background!;
 
+        // Show the default tool as being selected
         this._defaultBackground = defaultTool.Background;
         defaultTool.Background = new SolidColorBrush {
-            Color = DarkenColor(brush.Color)
+            Color = ColorUtil.AdjustHue(brush.Color)
         };
     }
 
+    /// <summary>
+    /// The rectangle tool was clicked
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="e">The event arguments</param>
     // ReSharper disable once UnusedParameter.Local
     private void Tool_RectangleClicked(object? sender, RoutedEventArgs e) {
         this.UpdateSelectedToolColor(sender!);
         CanvasState.SelectedTool = SelectedTool.Rectangle;
     }
 
+    /// <summary>
+    /// The ellipse tool was clicked
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="e">The event arguments</param>
     // ReSharper disable once UnusedParameter.Local
     private void Tool_EllipseClicked(object? sender, RoutedEventArgs e) {
         this.UpdateSelectedToolColor(sender!);
         CanvasState.SelectedTool = SelectedTool.Ellipse;
     }
 
+    /// <summary>
+    /// Update a button's color to indicate that it is currently selected
+    /// </summary>
+    /// <param name="newTool">The new tool</param>
     private void UpdateSelectedToolColor(object newTool) {
         Button newToolBtn = (Button)newTool;
         if (this._selectedTool != null) {
@@ -62,12 +86,12 @@ public partial class ToolbarWindow : Window {
         if (newToolBtn.Background! is ImmutableSolidColorBrush) {
             ImmutableSolidColorBrush background = (ImmutableSolidColorBrush)newToolBtn.Background!;
             newToolBtn.Background = new SolidColorBrush {
-                Color = DarkenColor(background.Color)
+                Color = ColorUtil.AdjustHue(background.Color)
             };
         } else {
             SolidColorBrush background = (SolidColorBrush)newToolBtn.Background!;
             newToolBtn.Background = new SolidColorBrush {
-                Color = DarkenColor(background.Color)
+                Color = ColorUtil.AdjustHue(background.Color)
             };
         }
 
@@ -75,31 +99,22 @@ public partial class ToolbarWindow : Window {
         this._selectedTool = newToolBtn;
     }
 
-    private static Color DarkenColor(Color r, double factor = 0.7d) {
-        Rgb originalColor = new() {
-            R = r.R,
-            G = r.G,
-            B = r.B,
-        };
-        
-        // Convert to HSV
-        Hsv hsv = ColorUtil.FromRgb(originalColor);
-
-        // Darken the color        
-        hsv.V *= factor;
-        
-        // Convert back to RGB
-        Rgb newColor = ColorUtil.FromHsv(hsv);
-
-        return new Color(255, (byte)newColor.R, (byte)newColor.G, (byte)newColor.B);
-    }
-
+    /// <summary>
+    /// The line tool was clicked
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="e">The event arguments</param>
     // ReSharper disable once UnusedParameter.Local
     private void Tool_LineClicked(object? sender, RoutedEventArgs e) {
         this.UpdateSelectedToolColor(sender!);
         CanvasState.SelectedTool = SelectedTool.Line;
     }
 
+    /// <summary>
+    /// The eraser tool was clicked
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="e">The event parameters</param>
     // ReSharper disable once UnusedParameter.Local
     private void Tool_EraserClicked(object? sender, RoutedEventArgs e) {
         this.UpdateSelectedToolColor(sender!);

@@ -5,16 +5,34 @@ using Schets.Backend.Exceptions;
 
 namespace Schets.Util; 
 
+/// <summary>
+/// Utilities for dealing with hit checking
+/// </summary>
 public static class HitUtil {
+    /// <summary>
+    /// Test a shape for a hit
+    /// </summary>
+    /// <param name="descriptor">The shape</param>
+    /// <param name="point">The point to test for</param>
+    /// <param name="screenDimensions">The dimensions of the screen</param>
+    /// <returns>True if the shape was hit</returns>
+    /// <exception cref="CaseNotImplementedException">No hit test is implemented for the provided shape</exception>
     public static bool HitTest(TemplateShapeDescriptor descriptor, Point point, Size screenDimensions) {
         return descriptor.ShapeType switch {
-            TemplateShapeType.Rectangle => HitTestSquare(descriptor, point, screenDimensions),
+            TemplateShapeType.Rectangle => HitTestRectangle(descriptor, point, screenDimensions),
             TemplateShapeType.Ellipse => HitTestEllipse(descriptor, point, screenDimensions),
             TemplateShapeType.Line => HitTestLine(descriptor, point, screenDimensions),
             _ => throw new CaseNotImplementedException($"No hit-test implemented for shape type {descriptor.ShapeType}")
         };
     }
 
+    /// <summary>
+    /// Hit test a straight line
+    /// </summary>
+    /// <param name="descriptor">The line</param>
+    /// <param name="point">The point to test for</param>
+    /// <param name="screenDimensions">The dimensions of the screen</param>
+    /// <returns>True if the line was hit</returns>
     private static bool HitTestLine(TemplateShapeDescriptor descriptor, Point point, Size screenDimensions) {
         double dist = MathUtil.DistanceToLine(
             descriptor.A.ToPoint(),
@@ -26,6 +44,13 @@ public static class HitUtil {
         return dist < factor;
     }
 
+    /// <summary>
+    /// Hit test an ellipse
+    /// </summary>
+    /// <param name="descriptor">The shape</param>
+    /// <param name="point">The point to test for</param>
+    /// <param name="screenDimensions">The dimensions of the screen</param>
+    /// <returns>True if the shape is hit</returns>
     private static bool HitTestEllipse(TemplateShapeDescriptor descriptor, Point point, Size screenDimensions) {
         double height = Math.Abs(descriptor.A.Y - descriptor.B.Y);
         double width = Math.Abs(descriptor.A.X - descriptor.B.X);
@@ -56,7 +81,14 @@ public static class HitUtil {
         }
     }
     
-    private static bool HitTestSquare(TemplateShapeDescriptor descriptor, Point point, Size screenDimensions) {
+    /// <summary>
+    /// Hit test a rectangle
+    /// </summary>
+    /// <param name="descriptor">The shape</param>
+    /// <param name="point">The point to test for</param>
+    /// <param name="screenDimensions">The screen dimensions</param>
+    /// <returns>True if hit</returns>
+    private static bool HitTestRectangle(TemplateShapeDescriptor descriptor, Point point, Size screenDimensions) {
         if (descriptor.BackgroundColor == null) { // Shape is outline only
             Point topLeft = descriptor.A.ToPoint();
             Point bottomRight = descriptor.B.ToPoint();

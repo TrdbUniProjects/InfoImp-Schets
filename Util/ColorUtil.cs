@@ -1,9 +1,16 @@
 using System;
 using System.IO;
+using Avalonia.Media;
 
 namespace Schets.Util;
 
+/// <summary>
+/// Color expressed as HSV
+/// </summary>
 public struct Hsv {
+    /// <summary>
+    /// The HSV components
+    /// </summary>
     public double H, S, V;
 
     public override string ToString() {
@@ -11,7 +18,13 @@ public struct Hsv {
     }
 }
 
+/// <summary>
+/// Color expressed as RGB
+/// </summary>
 public struct Rgb {
+    /// <summary>
+    /// The RGB components
+    /// </summary>
     public int R, G, B;
 
     public override string ToString() {
@@ -19,10 +32,19 @@ public struct Rgb {
     }
 }
 
+/// <summary>
+/// Utilities for dealing with colors
+/// </summary>
 public static class ColorUtil {
 
-    // Derived from: https://www.rapidtables.com/convert/color/rgb-to-hsv.html
+    /// <summary>
+    /// Convert an RGB color to the HSV spectrum
+    /// </summary>
+    /// <param name="rgb">The RGB to convert</param>
+    /// <returns>The HSV output</returns>
     public static Hsv FromRgb(Rgb rgb) {
+        // Derived from: https://www.rapidtables.com/convert/color/rgb-to-hsv.html
+        
         double r = rgb.R / 255d;
         double g = rgb.G / 255d;
         double b = rgb.B / 255d;
@@ -59,8 +81,14 @@ public static class ColorUtil {
         };
     }
 
-    // Derived from https://www.rapidtables.com/convert/color/hsv-to-rgb.html
+    /// <summary>
+    /// Convert a HSV color to the RGB spectrum
+    /// </summary>
+    /// <param name="hsv">The HSV color to convert</param>
+    /// <returns>The converted RGB</returns>
+    /// <exception cref="InvalidDataException">If the HSV is invalid</exception>
     public static Rgb FromHsv(Hsv hsv) {
+        // Derived from https://www.rapidtables.com/convert/color/hsv-to-rgb.html
         double c = hsv.V / 100 * (hsv.S / 100);
         double x = c * (1 - Math.Abs(hsv.H / 60 % 2 - 1));
         double m = hsv.V / 100 - c;
@@ -108,5 +136,33 @@ public static class ColorUtil {
             B = (int)Math.Round((b + m) * 255d),
         };
     } 
+    
+    /// <summary>
+    /// Darken or lighten a color.
+    /// </summary>
+    /// <param name="r">The color</param>
+    /// <param name="factor">
+    /// The factor. factor &gt; 1 means the new color is lighter.
+    /// If factor &lt; 1, that means the new color is darker
+    /// </param>
+    /// <returns>The new color</returns>
+    public static Color AdjustHue(Color r, double factor = 0.7d) {
+        Rgb originalColor = new() {
+            R = r.R,
+            G = r.G,
+            B = r.B,
+        };
+        
+        // Convert to HSV
+        Hsv hsv = FromRgb(originalColor);
+
+        // Darken the color        
+        hsv.V *= factor;
+        
+        // Convert back to RGB
+        Rgb newColor = FromHsv(hsv);
+
+        return new Color(255, (byte)newColor.R, (byte)newColor.G, (byte)newColor.B);
+    }
     
 }

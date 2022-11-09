@@ -1,6 +1,4 @@
-using System;
 using System.IO;
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
@@ -9,15 +7,25 @@ using Schets.Util;
 
 namespace Schets.UI; 
 
+/// <summary>
+/// Options for the selected tool. E.g. fill mode
+/// </summary>
 public partial class ToolOptions : UserControl {
     public ToolOptions() {
-        InitializeComponent();
+        this.InitializeComponent();
     }
 
     private void InitializeComponent() {
         AvaloniaXamlLoader.Load(this);
     }
 
+    /// <summary>
+    /// The Fill mode select was changed
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="e">The event arguments</param>
+    /// <exception cref="InvalidDataException">Thrown if the selected fill mode is invalid</exception>
+    // ReSharper disable once UnusedParameter.Local
     private void FillModeControl_OnSelectionChanged(object? sender, SelectionChangedEventArgs e) {
         ComboBox box = (ComboBox)sender!;
         CanvasState.FillMode = box.SelectedIndex switch {
@@ -28,6 +36,12 @@ public partial class ToolOptions : UserControl {
         };
     }
 
+    /// <summary>
+    /// The Brush width field was changed
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="e">The event parameters</param>
+    // ReSharper disable once UnusedParameter.Local
     private void BrushWidthField_OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e) {
         TextBox box = (TextBox)sender!;
 

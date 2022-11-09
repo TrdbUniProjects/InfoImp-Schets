@@ -13,7 +13,7 @@ namespace Schets.UI;
 public partial class CreateNewWindow : Window {
     
     public CreateNewWindow() {
-        InitializeComponent();
+        this.InitializeComponent();
 #if DEBUG
         this.AttachDevTools();
 #endif
