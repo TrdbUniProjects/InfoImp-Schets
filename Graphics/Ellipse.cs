@@ -3,6 +3,9 @@ using Avalonia.Media;
 
 namespace Schets.Graphics; 
 
+/// <summary>
+/// An elliptical shape
+/// </summary>
 public class Ellipse : AbstractShape {
     public override void Render(DrawingContext context) {
         double height = this.B.Y - this.A.Y;

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,11 +9,21 @@ using Avalonia.Media;
 using Schets.Backend;
 using Schets.Backend.Exceptions;
 using Schets.Backend.State;
+using Schets.Util;
 
 namespace Schets.Graphics; 
 
+/// <summary>
+/// The surface the user can draw their shapes on
+/// </summary>
 public partial class DrawSurface : UserControl {
+    /// <summary>
+    /// The point the user started drawing at
+    /// </summary>
     private Point? _drawStartPoint;
+    /// <summary>
+    /// Whether the pointer (i.e the primary mouse button) is currently pressed
+    /// </summary>
     private bool _isPointerDown;
     
     static DrawSurface() {
@@ -25,6 +34,9 @@ public partial class DrawSurface : UserControl {
         this.InitializeComponent();
     }
 
+    /// <summary>
+    /// Initialize this component
+    /// </summary>
     private void InitializeComponent() {
         AvaloniaXamlLoader.Load(this);
 
@@ -33,6 +45,10 @@ public partial class DrawSurface : UserControl {
         this.PointerMoved += this.OnPointerMovedEvent;
     }
 
+    /// <summary>
+    /// Render all shapes to the context
+    /// </summary>
+    /// <param name="context">The context to render to</param>
     public override void Render(DrawingContext context) {
         foreach(AbstractShape shape in GetShapes()) {
             shape.Render(context);
@@ -43,11 +59,20 @@ public partial class DrawSurface : UserControl {
         }
     }
 
+    /// <summary>
+    /// Event fired when the pointer is moused
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="args">The arguments to this event</param>
     private void OnPointerMovedEvent(object? sender, PointerEventArgs args) {
+        // If the mouse is not currently down,
+        // the user isn't drawing. We dont care
         if (!this._isPointerDown) {
             return;
         }
-
+        
+        // Show what the user will be drawing as they
+        // are moving their mouse
         if (CanvasState.DrawingShape != null) {
             TemplateShapeDescriptor shape = CanvasState.DrawingShape.Value;
 
@@ -121,7 +146,13 @@ public partial class DrawSurface : UserControl {
         this.InvalidateVisual();
     }
 
+    /// <summary>
+    /// Event fired when the mouse pointer is released
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="args">The arguments to this event</param>
     private void OnPointerPressedEvent(object? sender, PointerPressedEventArgs args) {
+        // We only care for the primary button
         if (!args.Pointer.IsPrimary) {
             return;
         }
@@ -130,7 +161,7 @@ public partial class DrawSurface : UserControl {
             int? idxToRemove = null;
             for (int idx = 0; idx < CanvasState.Layers.Count; idx++) {
                 TemplateShapeDescriptor descriptor = CanvasState.Layers[idx];
-                if (this.HitTest(descriptor, args.GetPosition(this))) {
+                if (HitUtil.HitTest(descriptor, args.GetPosition(this), new Size(this.Width, this.Height))) {
                     idxToRemove = idx;
                 }
             }
@@ -148,179 +179,11 @@ public partial class DrawSurface : UserControl {
         this._isPointerDown = true;
     }
 
-    private bool HitTest(TemplateShapeDescriptor descriptor, Point point) {
-        return descriptor.ShapeType switch {
-            TemplateShapeType.Rectangle => this.HitTestSquare(descriptor, point),
-            TemplateShapeType.Ellipse => this.HitTestEllipse(descriptor, point),
-            TemplateShapeType.Line => this.HitTestLine(descriptor, point),
-            _ => throw new CaseNotImplementedException($"No hit-test implemented for shape type {descriptor.ShapeType}")
-        };
-    }
-
-    private bool HitTestLine(TemplateShapeDescriptor descriptor, Point point) {
-        double dist = DistanceToLine(
-            descriptor.A.ToPoint(),
-            descriptor.B.ToPoint(),
-            point
-        );
-        double factor = Math.Max(this.Width * 0.05, this.Height * 0.05);
-        
-        return dist < factor;
-    }
-
-    private bool HitTestEllipse(TemplateShapeDescriptor descriptor, Point point) {
-        double height = Math.Abs(descriptor.A.Y - descriptor.B.Y);
-        double width = Math.Abs(descriptor.A.X - descriptor.B.X);
-        
-        if (descriptor.BackgroundColor == null) { // Outline only
-            Point center = new(descriptor.A.X + width / 2d, descriptor.A.Y + height / 2d);
-
-            double distance = DistanceToEllipse(center, width / 2, height / 2, point);
-            double factor = Math.Max(this.Width * 0.05, this.Height * 0.05);
-
-            return distance < factor;
-        } else { // Filled
-            // Andreas (https://math.stackexchange.com/users/317854/andreas), Point-Ellipse collision test., URL (version: 2017-01-26): https://math.stackexchange.com/q/2114902
-            
-            double x = point.X;
-            double y = point.Y;
-                
-            double mx = descriptor.A.X + width / 2d;
-            double my = descriptor.A.Y + height / 2d;
-            double sigmaX = Math.Abs(-descriptor.A.X + descriptor.B.X) / 2    ;
-            double sigmaY = Math.Abs(-descriptor.A.Y + descriptor.B.Y) / 2;
-
-            double resultX = (x - mx) * (x - mx) / (sigmaX * sigmaX);
-            double resultY = (y - my) * (y - my) / (sigmaY * sigmaY);
-            double result = resultX + resultY;
-
-            return result < 1;
-        }
-    }
-    
-    private bool HitTestSquare(TemplateShapeDescriptor descriptor, Point point) {
-        if (descriptor.BackgroundColor == null) { // Shape is outline only
-            Point topLeft = descriptor.A.ToPoint();
-            Point bottomRight = descriptor.B.ToPoint();
-
-            Point topRight = new (bottomRight.X, topLeft.Y);
-            Point bottomLeft = new (topLeft.X, bottomRight.Y);
-
-            // A rectangle is 4 sides, so we'll calculate the distance from
-            // the point to each side. If the distance is within the threshold 
-            // on any side, we'll consider it a hit
-
-            double distLeft = DistanceToLine(topLeft, bottomLeft, point);
-            double distTop = DistanceToLine(topLeft, topRight, point);
-            double distRight = DistanceToLine(topRight, bottomRight, point);
-            double distBottom = DistanceToLine(bottomRight, bottomLeft, point);
-
-            double wThreshold = this.Width * 0.05;
-            double hThreshold = this.Height * 0.05;
-            
-            return distLeft < wThreshold
-                   || distTop < hThreshold
-                   || distRight < wThreshold
-                   || distBottom < hThreshold;
-            
-        } else { // Shape is filled
-            Rect r = new Rect(descriptor.A.ToPoint(), descriptor.B.ToPoint()); 
-            return r.Contains(point);
-        }
-    }
-
-    private static double DistanceToEllipse(Point c, double radiusX, double radiusY, Point p) {
-        
-        // Point on the ellipse intersecting with the line between p and s
-        // However, the function assumes the ellipse to be on the origin
-        // So we translate the point accordingly
-        Point pTranslated = new(
-            p.X - c.X,
-            p.Y - c.Y
-        );
-        Point s = FindClosestPointOnEllipse(radiusX, radiusY, pTranslated);
-        // s is the point where the line between p and the origin intersects the ellipse CO.
-        // CO is centered on the origin, our ellipse C is not, translate S back to the 'real' space
-        Point sTranslated = new (
-            s.X + c.X,
-            s.Y + c.Y
-        );
-
-        // Pythahoras between the point on the ellipse and the point clicked
-        return Math.Sqrt(
-            (sTranslated.X - p.X) * (sTranslated.X - p.Y) 
-            + (sTranslated.Y - p.Y) * (sTranslated.Y - p.Y)
-        );
-    }
-    
-    private static Point FindClosestPointOnEllipse(double radiusX, double radiusY, Point p) {
-        // https://stackoverflow.com/a/46007540
-        // https://gist.github.com/JohannesMP/777bdc8e84df6ddfeaa4f0ddb1c7adb3
-        // https://github.com/0xfaded/ellipse_demo/issues/1
-        
-        double px = Math.Abs(p.X);
-        double py = Math.Abs(p.Y);
-
-        // semimajor
-        double a = Math.Max(radiusX, radiusY);
-        // semiminor
-        double b = Math.Min(radiusX, radiusY);
-
-        double tx = 0.70710678118;
-        double ty = 0.70710678118;
-
-        double aa = a * a;
-        double bb = b * b;
-
-        for (int i = 0; i < 3; i++) {
-            double x = a * tx;
-            double y = b * ty;
-
-            double ex = (aa - bb) * (tx * tx * tx) / a;
-            double ey = (bb - aa) * (ty * ty * ty) / b;
-
-            double rx = x - ex;
-            double ry = y - ey;
-
-            double qx = px - ex;
-            double qy = py - ey;
-
-            double r = Math.Sqrt(rx * rx + ry * ry);
-            double q = Math.Sqrt(qy * qy + qx * qx);
-
-            tx = Math.Min(1, Math.Max(0, (qx * r / q + ex) / a));
-            ty = Math.Min(1, Math.Max(0, (qy * r / q + ey) / b));
-
-            double t = Math.Sqrt(tx * tx + ty * ty);
-            
-            tx /= t;
-            ty /= t;
-        }
-
-        return new Point(
-            a * (p.X < 0 ? -tx : tx),
-            b * (p.Y < 0 ? -ty : ty)
-        );
-    }
-
-    /**
-     * Calculate the distance from point p0 to the line between p1 and p2.
-     *
-     * <param name="p1">Point 1 of the line</param>
-     * <param name="p2">Point 2 of the line</param>
-     * <param name="p0">The point to calculate the distance from</param>
-     */
-    private static double DistanceToLine(Point p1, Point p2, Point p0) {
-        // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_two_points
-        
-        // |(x2 - x1) * (y1 - y0) - (x1 - x0) * (y2 - y1)|
-        double top = Math.Abs((p2.X - p1.X) * (p1.Y - p0.Y) - (p1.X - p0.X) * (p2.Y - p1.Y));
-        // sqrt((x2 - x1)^2 + (y2 - y1)^2)
-        double bottom = Math.Sqrt((p2.X - p1.X) * (p2.X - p1.X) + (p2.Y - p1.Y) * (p2.Y - p1.Y));
-
-        return top / bottom;
-    }
-
+    /// <summary>
+    /// Event fired when the pointer is released
+    /// </summary>
+    /// <param name="sender">The object from which this event originates</param>
+    /// <param name="args">The arguments to this event</param>
     private void OnPointerReleasedEvent(object? sender, PointerReleasedEventArgs args) {
         if (CanvasState.SelectedTool == SelectedTool.Eraser) {
             return;
@@ -385,7 +248,7 @@ public partial class DrawSurface : UserControl {
                     };
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new CaseNotImplementedException($"The fill mode {CanvasState.FillMode} is not implemented");
             }
         }
 
@@ -393,6 +256,12 @@ public partial class DrawSurface : UserControl {
         this.InvalidateVisual();
     }
 
+    /// <summary>
+    /// Calculate the top left and bottom right coordinates of the shape
+    /// </summary>
+    /// <param name="start">The draw start point</param>
+    /// <param name="end">The draw end point</param>
+    /// <returns>A tuple of the top left and bottom right coordinates</returns>
     private static (TemplateCoordinate, TemplateCoordinate) CalculateShapeCoordinates(Point start, Point end) {
         // Shape can go into one of the four quadrants, with `start` at 0,0 of the imaginary surface.
         if (start.X > end.X) {
@@ -459,6 +328,12 @@ public partial class DrawSurface : UserControl {
         }
     }
 
+    /// <summary>
+    /// Get the shape type currently being drawn
+    /// </summary>
+    /// <returns>The shape currently being drawn</returns>
+    /// <exception cref="InvalidDataException">Thrown when a tool is selected which is not a shape</exception>
+    /// <exception cref="CaseNotImplementedException">Thrown when a tool is selected which is not implemented</exception>
     private static TemplateShapeType GetActiveShapeType() {
         return CanvasState.SelectedTool switch {
             SelectedTool.Rectangle => TemplateShapeType.Rectangle,
@@ -469,10 +344,20 @@ public partial class DrawSurface : UserControl {
         };
     }
 
+    /// <summary>
+    /// Get all layers as shapes
+    /// </summary>
+    /// <returns>All shapes</returns>
     private static IEnumerable<AbstractShape> GetShapes() {
         return CanvasState.Layers.Select(GetShapeFromLayer);
     }
 
+    /// <summary>
+    /// Convert a layer to shape object
+    /// </summary>
+    /// <param name="layer">The layer to covert</param>
+    /// <returns>The shape</returns>
+    /// <exception cref="CaseNotImplementedException">When the layer has a shape that is not implemented</exception>
     private static AbstractShape GetShapeFromLayer(TemplateShapeDescriptor layer) {
         AbstractShape shape = layer.ShapeType switch {
             TemplateShapeType.Rectangle => new Rectangle(),
@@ -485,6 +370,17 @@ public partial class DrawSurface : UserControl {
         return shape;
     }
 
+    /// <summary>
+    /// Set the properties of the shape.
+    /// This includes:
+    /// - The A coordinate
+    /// - The B coordinate
+    /// - The outline
+    /// - The fill
+    /// </summary>
+    /// <param name="shape">The shape</param>
+    /// <param name="layer">The layer</param>
+    /// <typeparam name="T">The type of the shape</typeparam>
     private static void SetShapeProperties<T>(ref T shape, TemplateShapeDescriptor layer) where T: AbstractShape {
         shape.A = new Point(layer.A.X, layer.A.Y);
         shape.B = new Point(layer.B.X, layer.B.Y);
