@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using Avalonia.Media;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Schets.Backend.State;
 
@@ -52,6 +53,7 @@ public static class CanvasState {
     /// <param name="shape">The layer</param>
     public static void AddLayer(TemplateShapeDescriptor shape) {
         Layers.Add(shape);
+        ProgramState.ModifiedSinceLastSave = true;
     }
 
     /// <summary>
@@ -61,9 +63,11 @@ public static class CanvasState {
     /// <exception cref="WarningException">The index was out of bounds</exception>
     public static void RemoveLayer(int idx) {
         if (idx > Layers.Count) {
-            throw new WarningException($"Index {idx} out of bounds for _layers. Length = {Layers.Count}");
+            throw new WarningException($"Index {idx} out of bounds for Layers. Length = {Layers.Count}");
         }
-
+        
         Layers.RemoveAt(idx);
+        
+        ProgramState.ModifiedSinceLastSave = true;
     }
 }

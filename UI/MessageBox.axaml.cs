@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
@@ -52,7 +53,8 @@ public partial class MessageBox : Window {
         No
     }
 
-    private MessageBox() {
+    // ReSharper disable once MemberCanBePrivate.Global
+    public MessageBox() {
         AvaloniaXamlLoader.Load(this);
     }
     
@@ -64,9 +66,10 @@ public partial class MessageBox : Window {
     /// <param name="title">The title of the window</param>
     /// <param name="buttons">The buttons to show</param>
     /// <returns>The Task containing the result of the message box</returns>
-    public static Task Show(Window parent, string text, string title, MessageBoxButtons buttons) {
+    public static Task<MessageBoxResult> Show(Window? parent, string text, string title, MessageBoxButtons buttons) {
         MessageBox msgbox = new() {
-            Title = title
+            Title = title,
+            TransparencyLevelHint = WindowTransparencyLevel.None
         };
         msgbox.FindControl<TextBlock>("Text").Text = text;
         StackPanel buttonPanel = msgbox.FindControl<StackPanel>("Buttons");
@@ -96,20 +99,24 @@ public partial class MessageBox : Window {
                 AddButton("Ok", MessageBoxResult.Ok, true);
                 break;
             case MessageBoxButtons.YesNo:
+                AddButton("Yes", MessageBoxResult.Yes);
+                break;
             case MessageBoxButtons.YesNoCancel:
                 AddButton("Yes", MessageBoxResult.Yes);
                 AddButton("No", MessageBoxResult.No, true);
                 break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(buttons), buttons, null);
         }
 
-        if (buttons == MessageBoxButtons.OkCancel || buttons == MessageBoxButtons.YesNoCancel) {
+        if (buttons is MessageBoxButtons.OkCancel or MessageBoxButtons.YesNoCancel) {
             AddButton("Cancel", MessageBoxResult.Cancel, true);
         }
 
         TaskCompletionSource<MessageBoxResult> tcs = new TaskCompletionSource<MessageBoxResult>();
-        msgbox.Closed += delegate { tcs.TrySetResult(res); };
+        msgbox.Closed += (_, _) => { tcs.TrySetResult(res); };
         if (parent != null) {
-            msgbox.ShowDialog(parent);
+            msgbox.ShowDialog(parent).Wait();
         } else {
             msgbox.Show();
         }

@@ -1,0 +1,65 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        Width="340"
+        Height="100"
+        mc:Ignorable="d" d:DesignWidth="340" d:DesignHeight="100"
+        x:Class="Schets.UI.ColorWindow"
+        Title="Colors">
+  <Grid Margin="0,5,0,0" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+    <!-- Primary color -->
+    <Label Margin="0,3,0,0" Grid.Row="0" Grid.Column="0">Primary</Label>
+    
+    <Label Margin="0,4,0,0" Grid.Row="0" Grid.Column="1">R</Label>
+    <TextBox 
+      Grid.Row="0" 
+      Grid.Column="2"
+      PropertyChanged="OnPrimaryRChanged">
+      0
+    </TextBox>
+    
+    <Label Margin="0,4,0,0" Grid.Row="0" Grid.Column="3">G</Label>
+    <TextBox 
+      Grid.Row="0" 
+      Grid.Column="4"
+      PropertyChanged="OnPrimaryGChanged">
+      0
+    </TextBox>
+    
+    <Label Margin="0,4,0,0" Grid.Row="0" Grid.Column="5">B</Label>
+    <TextBox 
+      Grid.Row="0" 
+      Grid.Column="6"
+      PropertyChanged="OnPrimaryBChanged">
+      0
+    </TextBox>
+    
+    <!-- Secondary color -->
+    <Label Margin="0,3,0,0" Grid.Row="1" Grid.Column="0">Secondary</Label>
+    
+    <Label Margin="0,4,0,0" Grid.Row="1" Grid.Column="1">R</Label>
+    <TextBox 
+      Grid.Row="1" 
+      Grid.Column="2"
+      PropertyChanged="OnSecondaryRChanged">
+      255
+    </TextBox>
+    
+    <Label Margin="0,4,0,0" Grid.Row="1" Grid.Column="3">G</Label>
+    <TextBox 
+      Grid.Row="1" 
+      Grid.Column="4"
+      PropertyChanged="OnSecondaryGChanged">
+      255
+    </TextBox>
+    
+    <Label Margin="0,4,0,0" Grid.Row="1" Grid.Column="5">B</Label>
+    <TextBox 
+      Grid.Row="1" 
+      Grid.Column="6"
+      PropertyChanged="OnSecondaryBChanged">
+      255
+    </TextBox>
+  </Grid>
+</Window>

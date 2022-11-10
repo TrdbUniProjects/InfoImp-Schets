@@ -23,6 +23,7 @@
         </MenuItem>
         <MenuItem Header="_Window">
           <MenuItem Header="_Tools" Click="Window_ToolClicked"></MenuItem>
+          <MenuItem Header="_Colors" Click="Window_ColorClicked"></MenuItem>
         </MenuItem>
       </Menu>
       

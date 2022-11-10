@@ -133,7 +133,7 @@ public partial class DrawSurface : UserControl {
                     break;
                 case FillMode.FilledOutline:
                     descriptor.Outline = new TemplateShapeOutline {
-                        Color = CanvasState.PrimaryColor,
+                        Color = CanvasState.SecondaryColor,
                         Thickness = CanvasState.BrushWidth
                     };
                     descriptor.BackgroundColor = CanvasState.PrimaryColor;
@@ -169,7 +169,8 @@ public partial class DrawSurface : UserControl {
             if (idxToRemove == null) {
                 return;
             }
-            CanvasState.Layers.RemoveAt(idxToRemove.Value);
+            
+            CanvasState.RemoveLayer(idxToRemove.Value);
             this.InvalidateVisual();
 
             return;
