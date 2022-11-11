@@ -4,6 +4,14 @@ using Avalonia;
 namespace Schets.Util; 
 
 public static class MathUtil {
+    /// <summary>
+    /// Calculate the distance from a point to nearest edge of the ellipse
+    /// </summary>
+    /// <param name="c">The center of the ellipse</param>
+    /// <param name="radiusX">The X radius of the ellipse</param>
+    /// <param name="radiusY">The Y radius of the ellipse</param>
+    /// <param name="p">The point to check from</param>
+    /// <returns>The distance</returns>
     public static double DistanceToEllipse(Point c, double radiusX, double radiusY, Point p) {
         // Point on the ellipse intersecting with the line between p and s
         // However, the function assumes the ellipse to be on the origin
@@ -27,6 +35,14 @@ public static class MathUtil {
         );
     }
     
+    /// <summary>
+    /// Find the closest point on the edge of an ellipse to a point.
+    /// The ellipse is centered on (0,0).
+    /// </summary>
+    /// <param name="radiusX">The X radius</param>
+    /// <param name="radiusY">The Y radius</param>
+    /// <param name="p">The point</param>
+    /// <returns>The point which lies on the ellipse and is closest to p</returns>
     public static Point FindClosestPointOnEllipse(double radiusX, double radiusY, Point p) {
         // https://stackoverflow.com/a/46007540
         // https://gist.github.com/JohannesMP/777bdc8e84df6ddfeaa4f0ddb1c7adb3
@@ -43,6 +59,8 @@ public static class MathUtil {
         double tx = 0.70710678118;
         double ty = 0.70710678118;
 
+        // Square them outside the loop
+        // for performance increase
         double aa = a * a;
         double bb = b * b;
 
